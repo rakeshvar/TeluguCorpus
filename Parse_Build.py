@@ -1,13 +1,16 @@
-import re
-from collections import Counter
+from collections import Counter, namedtuple
 
 import Data
 import Utils
 from Cleaner import clean
 from Sampler import SamplerMat, SamplerDict
 from TriGram import TriGram
+from Unicode import print_char_counts
 
-def parse(text, pattern):
+#--------------------------------------
+# Pattern Matching and finding hits and misses
+#--------------------------------------
+def match_pattern(text, pattern):
     matched, missed = [], []
     i, last_end = 0, 0
 
@@ -28,34 +31,58 @@ def parse(text, pattern):
 
     return matched, missed
 
-def test_parse(patt, text = "ఉఁకగఃరిలుంక్రత్తంమత్స్యంకృత్స్న సాఫ్ట్‌వేర్ గ్ం (abc123) #x $99.9 [?] ఽ।॥ ₹౩౨,౫"):
-    tt, ot = parse(text, patt)
-    print("Allowed  Telugu Text: ", tt)
-    print("Unallowed Other Text: ", ot)
 
+def parse_allowed_unallowed(patterns, out_heads, num_docs=9**9):
+    Result = namedtuple('Result', ['allowed', 'unallowed'])
+    results = [Result(allowed=Counter(), unallowed=Counter()) for _ in patterns]
 
-def build_akshara_grams(patt,
-                        gz_out = "akshara_grams.pkl.gz",
-                        npz_out = "akshara_grams.npz"):
+    for i, d in enumerate(Data.OSCAR(num_docs)):
+        for patt, result in zip(patterns, results):
+            tt, ot = match_pattern(d, patt)
+            result.allowed.update(tt)
+            result.unallowed.update(ot)
+
+    for result, out_head in zip(results, out_heads):
+        Utils.save_counter_csv(result.allowed, out_head + '_allowed', ['AllowedChar', 'Count'])
+        Utils.save_counter_json(result.allowed, out_head + '_allowed')
+        Utils.save_counter_csv(result.unallowed, out_head + '_unallowed', ['UnallowedChar', 'Count'])
+        Utils.save_counter_json(result.unallowed, out_head + '_unallowed')
+
+#--------------------------------------
+# Counts
+#--------------------------------------
+def count_chars(num_docs):
+    char_counts = Counter()
+    for d in Data.OSCAR(num_docs):
+        char_counts.update(d)
+    print_char_counts(char_counts)
+    Utils.save_counter_json(char_counts, "char_counts.json")
+    Utils.save_counter_csv(char_counts, "char_counts.csv")
+
+#--------------------------------------
+# Make the TriGram
+#--------------------------------------
+def build_akshara_grams(patt, outhead, num_docs=9**9):
     model = TriGram()
-    data = Data.OSCAR()
+    data = Data.OSCAR(num_docs)
     spurious = Counter()
 
     for d in data:
         d = clean(d)
-        tel, oth = parse(d, patt)
+        tel, oth = match_pattern(d, patt)
         model.process_text(tel)
         spurious.update(oth)
 
     model.convert_to_mat()
-    model.save_dicts(gz_out)
-    model.save_mats_to_npz(npz_out)
-    Utils.save_counter_csv(spurious, "spurious_aksharas.csv")
+    model.save_dicts(outhead)
+    model.save_mats_to_npz(outhead)
+    Utils.save_counter_csv(spurious, "spurious_" + outhead)
 
 
-def test_gen(gz_in = "akshara_grams.pkl.gz",
-             npz_in = "akshara_grams.npz",
-             nchars=200):
+#--------------------------------------
+# Generate from TriGram
+#--------------------------------------
+def test_gen(gz_in, npz_in, nchars=200):
     samplerd = SamplerDict(gz_in)
     samplerm = SamplerMat(npz_in)
 

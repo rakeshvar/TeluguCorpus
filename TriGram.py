@@ -3,6 +3,9 @@ import pickle
 from collections import defaultdict, Counter
 import numpy as np
 
+from Utils import ensure_ext
+
+
 class TriGram():
     def __init__(self):
         self.uni = Counter()
@@ -44,6 +47,7 @@ class TriGram():
                     self.trimat[stoi[s], stoi[t], stoi[u]] = count
 
     def save_dicts(self, filename):
+        filename = ensure_ext(filename, "pkl.gz")
         with gzip.open(filename, 'wb') as f:
             pickle.dump({
                 'uni': self.uni,
@@ -52,6 +56,7 @@ class TriGram():
             }, f)
 
     def save_mats_to_npz(self, out_path):
+        out_path = ensure_ext(out_path, "npz")
         chars, indices = zip(*self.stoi.items())
         np.savez_compressed(
             out_path,

@@ -1,21 +1,26 @@
-from collections import Counter
+from pathlib import Path
 
-import Data
-import Utils
-from Unicode import print_char_set, print_char_counts
+from Parse_Build import match_pattern, parse_allowed_unallowed, build_akshara_grams
+from PatternAkshara import akshara_pattern
+from PatternCharacter import allowed_pattern
 
-data = Data.OSCAR()
 
-def show_chars():
-    char_set = set()
-    for d in data:
-        char_set.update(d)
-    print_char_set(char_set)
+def test_parse(patt, *, text=None, file=None):
+    if text is None:
+        text = Path(file).read_text(encoding='utf-8', errors="ignore")
 
-def count_chars():
-    char_counts = Counter()
-    for d in data:
-        char_counts.update(d)
-    print_char_counts(char_counts)
-    Utils.save_counter_json(char_counts, "char_counts.json")
-    Utils.save_counter_csv(char_counts, "char_counts.csv")
+    tt, ot = match_pattern(text, patt)
+    print("Allowed  Telugu Text: ", tt)
+    print("Unallowed Other Text: ", ot)
+
+
+parse_allowed_unallowed(
+    [akshara_pattern, allowed_pattern],
+    ["akshara", "character"],
+    max_docs=100
+)
+
+build_akshara_grams(allowed_pattern, "chargram100", num_docs=100)
+build_akshara_grams(akshara_pattern, "akshargram100", num_docs=100)
+build_akshara_grams(allowed_pattern, "chargram")
+build_akshara_grams(akshara_pattern, "akshargram")
