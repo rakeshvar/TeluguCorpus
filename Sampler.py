@@ -3,7 +3,7 @@ import numpy as np
 
 from TriGram import TriGram
 
-class SamplerMat():
+class SamplerMat:
     def __init__(self, npzfile:str):
         assert npzfile.endswith('.npz'), "Should give an npz file"
         self.unimat, self.bimat, self.trimat, self.chars, self.indices = TriGram.load_mats_from_npz(npzfile)
@@ -11,7 +11,7 @@ class SamplerMat():
         self.itos = dict(zip(self.indices, self.chars))
 
         self.uniprobs = self.unimat.astype(np.float32) / self.unimat.sum()
-        self.biprobs = self.bimat.astype(np.float32) / self.bimat.sum(axis=(0, 1), keepdims=True)  # +1 ?
+        self.biprobs = self.bimat.astype(np.float32) / self.bimat.sum(axis=1, keepdims=True)  # +1 ?
         self.triprobs = self.trimat.astype(np.float32) / self.trimat.sum(axis=2, keepdims=True)
         self.vocab_size = self.uniprobs.shape[0]
 
@@ -25,7 +25,7 @@ class SamplerMat():
         len1 = len(init)
 
         if len(init) == 0:
-            init = [0]  # Todo: self.begin
+            init = [self.stoi['\n']]
             length -= 1
 
         if len(init) == 1:
@@ -64,7 +64,7 @@ class SamplerMat():
         return [self.stoi[s] for s in text]
 
 
-class SamplerDict():
+class SamplerDict:
     def __init__(self, gzfile):
         assert gzfile.endswith('.pkl.gz'), "Should given a gz file"
         self.uni, self.bi, self.tri = TriGram.load_dicts(gzfile)
@@ -83,7 +83,7 @@ class SamplerDict():
 
     def generate_text(self, init, length):
         if len(init) == 0:
-            init = [0]  # Todo: [self.begtoken]
+            init = ['\n']
 
         if len(init) == 1:
             init.append(self.next_char_bi(init[0]))

@@ -5,9 +5,9 @@ class OSCAR:
         print(f"Loading OSCAR Telugu dataset...")
         self.dataset = load_dataset("oscar-corpus/OSCAR-2301",
                                use_auth_token=True,  # required
-                               language="te",
-                               streaming=True,  # optional
-                               split="train")  # optional
+                               language="te",)
+                               # streaming=True,  # optional
+                               # split="train")  # optional
 
     def __iter__(self):
         for d in self.dataset:

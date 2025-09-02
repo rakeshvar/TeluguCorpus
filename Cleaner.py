@@ -2,9 +2,6 @@ import re
 import unicodedata
 from typing import List, Tuple
 
-allowed = r'ఀ-౿\s.,!?;:()\[\]{}"\'`\-–—‘’“”।॥'
-not_allowed_pattern = rf'[^{allowed}]'
-allowed_pattern = rf'[{allowed}]'
 quote_patterns = [
             (r'(\W|^)"(\w)', r'\1“\2'),  # Opening double quotes
             (r'(\w)"(\W|$)', r'\1”\2'),  # Closing double quotes
@@ -27,15 +24,16 @@ def clean_quotes(text: str) -> str:
 
     return text
 
-def find_missed_quotes(text: str, W: int = 2) -> List[Tuple[int, int, str]]:
+def find_missed_quotes(text: str, buf: int = 2) -> List[Tuple[int, int, str]]:
     """Find remaining ASCII quotes that might need manual review"""
     missed = []
     for match in re.finditer(r'["\']', text):
-        context = text[max(0, match.start() - W):min(len(text), match.end() + W)]
+        context = text[max(0, match.start() - buf):min(len(text), match.end() + buf)]
         missed.append((match.start(), match.end(), context))
     return missed
 
-def white_spaces(text:str) -> str:
+def clean_white_spaces(text:str) -> str:
+    text = text.replace('-', '–')
     text = text.replace('\t', ' ')
     text = re.sub(r' +', ' ', text)
     text = re.sub(r'\r', '\n', text)
@@ -44,7 +42,7 @@ def white_spaces(text:str) -> str:
     # text = re.sub(r'([.,!?;:])([^\s])', r'\1 \2', text)     # Add space after punctuation
     return text.strip()
 
-def other_clean(text:str) -> str:
+def clean_unicode(text:str) -> str:
     # Remove zero-width characters and other invisible Unicode chars
     # text = ''.join(char for char in text if unicodedata.category(char) != 'Cf')
 
@@ -53,4 +51,7 @@ def other_clean(text:str) -> str:
     return text
 
 def clean(text):
+    text = clean_quotes(text)
+    text = clean_white_spaces(text)
+    text = clean_unicode(text)
     return text

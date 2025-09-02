@@ -33,6 +33,6 @@ def print_char_set(cs):
         print(f"U+{ord(c):04X} {c} {get_char_name(c)}")
 
 def print_char_counts(cs):
-    chars, counts = zip(*sorted(cs.items(), key=lambda kv: kv[0], reverse=True))
-    for c, co in zip(chars, counts):
-        print(f"U+{ord(c):04X} {c} {get_char_name(c)} {co:7d}")
+    chars = sorted(cs.keys(), key=lambda c: cs[c], reverse=True)
+    for c in chars:
+        print(f"U+{ord(c):04X} {c} {get_char_name(c)} {cs[c]:7d}")
