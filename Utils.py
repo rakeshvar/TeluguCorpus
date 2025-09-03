@@ -16,7 +16,7 @@ def ensure_ext(name, ext):
 def save_counter_json(counter, filename):
     filename = ensure_ext(filename, 'json')
     with open(filename, 'w') as f:
-        json.dump(OrderedDict(counter.most_common()), f, indent=4)
+        json.dump(OrderedDict(counter.most_common()), f, indent=2, ensure_ascii=False)
     print("Saved ", filename)
 
 #----------------------------------

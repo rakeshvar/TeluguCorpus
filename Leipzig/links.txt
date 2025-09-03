@@ -1,0 +1,6 @@
+https://downloads.wortschatz-leipzig.de/corpora/tel_community_2021.tar.gz
+https://downloads.wortschatz-leipzig.de/corpora/tel_news_2020_100K.tar.gz
+https://downloads.wortschatz-leipzig.de/corpora/tel_newscrawl_2011_300K.tar.gz
+https://downloads.wortschatz-leipzig.de/corpora/tel_wikipedia_2021_10K.tar.gz
+https://downloads.wortschatz-leipzig.de/corpora/tel_wikipedia_2021_300K.tar.gz
+https://downloads.wortschatz-leipzig.de/corpora/tel_wikipedia_2021_30K.tar.gz

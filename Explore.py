@@ -1,26 +1,30 @@
-from pathlib import Path
 
-from Parse_Build import match_pattern, parse_allowed_unallowed, build_akshara_grams
+from Parse_Build import parse_allowed_unallowed, build_akshara_grams
 from PatternAkshara import akshara_pattern
 from PatternCharacter import allowed_pattern
 
+outdir = "models"
 
-def test_parse(patt, *, text=None, file=None):
-    if text is None:
-        text = Path(file).read_text(encoding='utf-8', errors="ignore")
-
-    tt, ot = match_pattern(text, patt)
-    print("Allowed  Telugu Text: ", tt)
-    print("Unallowed Other Text: ", ot)
-
+#-------------------
+# Test Run
+#-------------------
+M, Mt = 10000, "10K"
 
 parse_allowed_unallowed(
     [akshara_pattern, allowed_pattern],
-    ["akshara", "character"],
-    max_docs=100
+    [f"{outdir}/akshara_{Mt}", f"{outdir}/character_{Mt}"],
+    max_docs=M
+)
+build_akshara_grams(allowed_pattern, f"{outdir}/chargram_{Mt}", max_docs=M)
+build_akshara_grams(akshara_pattern, f"{outdir}/akshargram_{Mt}", max_docs=M)
+
+#-------------------
+# Main Run
+#-------------------
+parse_allowed_unallowed(
+    [allowed_pattern, akshara_pattern],
+    [f"{outdir}/character", f"{outdir}/akshara"],
 )
 
-build_akshara_grams(allowed_pattern, "chargram100", num_docs=100)
-build_akshara_grams(akshara_pattern, "akshargram100", num_docs=100)
-build_akshara_grams(allowed_pattern, "chargram")
-build_akshara_grams(akshara_pattern, "akshargram")
+build_akshara_grams(allowed_pattern, f"{outdir}/chargram")
+build_akshara_grams(akshara_pattern, f"{outdir}/akshargram")

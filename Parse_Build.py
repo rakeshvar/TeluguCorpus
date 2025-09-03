@@ -1,4 +1,5 @@
 from collections import Counter, namedtuple
+from tqdm import tqdm
 
 import Data
 import Utils
@@ -21,7 +22,6 @@ def match_pattern(text, pattern):
         if start > last_end:
             missed_text = text[last_end:start]
             missed.append(missed_text)
-            print("Missed: ", missed_text)
         last_end = end
         matched.append(match_text)
 
@@ -32,11 +32,11 @@ def match_pattern(text, pattern):
     return matched, missed
 
 
-def parse_allowed_unallowed(patterns, out_heads, num_docs=9**9):
+def parse_allowed_unallowed(patterns, out_heads, max_docs=None):
     Result = namedtuple('Result', ['allowed', 'unallowed'])
     results = [Result(allowed=Counter(), unallowed=Counter()) for _ in patterns]
 
-    for i, d in enumerate(Data.OSCAR(num_docs)):
+    for i, d in enumerate(tqdm(Data.Default(max_docs), desc="Parsing Patterns of Data")):
         for patt, result in zip(patterns, results):
             tt, ot = match_pattern(d, patt)
             result.allowed.update(tt)
@@ -51,9 +51,9 @@ def parse_allowed_unallowed(patterns, out_heads, num_docs=9**9):
 #--------------------------------------
 # Counts
 #--------------------------------------
-def count_chars(num_docs):
+def count_chars(max_docs):
     char_counts = Counter()
-    for d in Data.OSCAR(num_docs):
+    for d in Data.Default(max_docs):
         char_counts.update(d)
     print_char_counts(char_counts)
     Utils.save_counter_json(char_counts, "char_counts.json")
@@ -62,22 +62,22 @@ def count_chars(num_docs):
 #--------------------------------------
 # Make the TriGram
 #--------------------------------------
-def build_akshara_grams(patt, outhead, num_docs=9**9):
+def build_akshara_grams(patt, outhead, max_docs=None):
+    print("Building trigram using pattern: ", patt)
     model = TriGram()
-    data = Data.OSCAR(num_docs)
+    data = Data.Default(max_docs)
     spurious = Counter()
 
-    for d in data:
+    for d in tqdm(data, desc="Feeding text to Trigram"):
         d = clean(d)
         tel, oth = match_pattern(d, patt)
         model.process_text(tel)
         spurious.update(oth)
 
-    model.convert_to_mat()
+    Utils.save_counter_csv(spurious, outhead + "_spurious")
     model.save_dicts(outhead)
+    model.convert_to_mat()
     model.save_mats_to_npz(outhead)
-    Utils.save_counter_csv(spurious, "spurious_" + outhead)
-
 
 #--------------------------------------
 # Generate from TriGram

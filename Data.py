@@ -1,7 +1,30 @@
 import random
 from datasets import load_dataset
-from datasets import load_dataset
 
+class Leipzig:
+    def __init__(self, max_docs=None):
+        self.max_docs = max_docs
+        with open("leipzig.txt", "r", encoding='utf-8') as f:
+            self.contents = f.readlines()
+
+    def __iter__(self):
+        for i, line in enumerate(self.contents):
+            if self.max_docs is not None and i >= self.max_docs:
+                break
+            yield line
+
+    def __getitem__(self, idx):
+        if self.max_docs is not None and idx >= self.max_docs:
+            raise IndexError("Index out of range")
+        return self.contents[idx]
+
+    def __len__(self):
+        if self.max_docs is not None:
+            return min(self.max_docs, len(self.contents))
+        else:
+            return len(self.contents)
+
+Default = Leipzig
 
 class OSCAR:
     def __init__(self, max_docs=None, seed=42, streaming=True):
