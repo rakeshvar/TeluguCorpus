@@ -5,7 +5,7 @@ from PatternAkshara import akshara_pattern
 from PatternCharacter import character_pattern
 
 outdir = "counts"
-Path(outdir).mkdir(parents=True, exist_ok=True)
+Path(outdir).mkdir(exist_ok=True)
 
 #-------------------
 # Test Run

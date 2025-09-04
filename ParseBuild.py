@@ -11,6 +11,13 @@ from Unicode import print_char_counts
 #--------------------------------------
 # Pattern Matching and finding hits and misses
 #--------------------------------------
+def match_pattern_simple(text, pattern):
+    matches = ['\n']
+    for match in pattern.finditer(text):
+        matches.append(match.group())
+    matches.append('\n')
+    return matches
+
 def match_pattern(text, pattern):
     matched, missed = [], []
     i, last_end = 0, 0
@@ -73,31 +80,12 @@ def build_akshara_grams(patt, outhead, max_docs=None):
     print("Building trigram using pattern: ", patt)
     model = TriGram()
     data = Data.Default(max_docs)
-    spurious = Counter()
 
     for d in tqdm(data, desc="Feeding text to Trigram"):
         d = clean_text(d)
-        tel, oth = match_pattern(d, patt)
+        tel = match_pattern_simple(d, patt)
         model.process_text(tel)
-        spurious.update(oth)
 
-    Utils.save_counter_csv(spurious, outhead + "_spurious")
     model.save_dicts(outhead)
     model.convert_to_mat()
     model.save_mats_to_npz(outhead)
-
-#--------------------------------------
-# Generate from TriGram
-#--------------------------------------
-def test_gen(gz_in, npz_in, nchars=200):
-    samplerd = SamplerDict(gz_in)
-    samplerm = SamplerMat(npz_in)
-
-    textd = samplerd.generate_text(["\n"], nchars)
-    textm = samplerm.generate_text([samplerm.stoi("\n")], nchars)
-
-    perpd = samplerm.perplexity(textd)
-    perpm = samplerm.perplexity(textm)
-
-    print(f"Text: {textd}\nPerplexity: {perpd:6.4f}")
-    print(f"Text: {textm}\nPerplexity: {perpm:6.4f}")

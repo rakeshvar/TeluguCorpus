@@ -70,16 +70,22 @@ class SamplerDict:
         self.uni, self.bi, self.tri = TriGram.load_dicts(gzfile)
 
     def next_char_uni(self):
-        k, v = zip(*self.uni)
-        return random.choices(k, weights=v, k=1)
+        k, v = zip(*self.uni.items())
+        return random.choices(k, weights=v, k=1)[0]
 
     def next_char_bi(self, a):
+        if len(self.bi[a]) == 0:
+            return self.next_char_uni()
         k, v = zip(*self.bi[a].items())
-        return random.choices(k, weights=v, k=1)
+        return random.choices(k, weights=v, k=1)[0]
 
     def next_char_tri(self, a, b):
+        if a not in self.tri or len(self.tri[a]) == 0:
+            return self.next_char_uni()
+        if b not in self.tri[a] or len(self.tri[a][b]) == 0:
+            return self.next_char_bi(a)
         k, v = zip(*self.tri[a][b].items())
-        return random.choices(k, weights=v, k=1)
+        return random.choices(k, weights=v, k=1)[0]
 
     def generate_text(self, init, length):
         if len(init) == 0:
@@ -91,4 +97,4 @@ class SamplerDict:
         for i in range(length):
             init.append(self.next_char_tri(*init[-2:]))
 
-        return init
+        return "".join(init)
