@@ -1,11 +1,20 @@
-import random
 from datasets import load_dataset
 
-class Leipzig:
+leipzig_txt = "Corpus_Leipzig/leipzig.txt"
+eemaata_txt = "Corpus_Eemaata/eemaata.txt"
+files = [
+    leipzig_txt,
+    eemaata_txt
+]
+
+# TODO: Make it take the list of files as args along with max_docs
+class DataLoader:
     def __init__(self, max_docs=None):
         self.max_docs = max_docs
-        with open("Leipzig/leipzig.txt", "r", encoding='utf-8') as f:
-            self.contents = f.readlines()
+        self.contents = []
+        for file in files:
+            with open(file, "r", encoding='utf-8') as fp:
+                self.contents.extend(fp.readlines())
 
     def __iter__(self):
         for i, line in enumerate(self.contents):
@@ -24,7 +33,6 @@ class Leipzig:
         else:
             return len(self.contents)
 
-Default = Leipzig
 
 class OSCAR:
     def __init__(self, max_docs=None, seed=42, streaming=True):

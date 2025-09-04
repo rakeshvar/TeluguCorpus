@@ -39,13 +39,13 @@ def match_pattern(text, pattern):
     return matched, missed
 
 
-def count_allowed_unallowed(patterns, out_heads, max_docs=None, clean=True):
+def count_allowed_unallowed(patterns, out_heads, max_docs=None, clean=False, save_csv=False):
     Result = namedtuple('Result', ['allowed', 'unallowed', 'unallowedchar'])
     results = [Result(allowed=Counter(),
                       unallowed=Counter(),
                       unallowedchar=Counter()) for _ in patterns]
 
-    for i, d in enumerate(tqdm(Data.Default(max_docs), desc="Parsing Patterns of Data")):
+    for i, d in enumerate(tqdm(Data.DataLoader(max_docs), desc="Parsing Patterns of Data")):
         if clean:
             d = clean_text(d)
         for patt, result in zip(patterns, results):
@@ -55,11 +55,12 @@ def count_allowed_unallowed(patterns, out_heads, max_docs=None, clean=True):
             result.unallowedchar.update("".join(ot))
 
     for result, out_head in zip(results, out_heads):
-        Utils.save_counter_csv(result.allowed, out_head + '_allowed', ['AllowedChar', 'Count'])
+        if save_csv:
+            Utils.save_counter_csv(result.allowed, out_head + '_allowed', ['AllowedChar', 'Count'])
+            Utils.save_counter_csv(result.unallowed, out_head + '_unallowed', ['UnallowedChar', 'Count'])
+            Utils.save_counter_csv(result.unallowedchar, out_head + '_unallowedchar', ['UnallowedChar', 'Count'])
         Utils.save_counter_json(result.allowed, out_head + '_allowed')
-        Utils.save_counter_csv(result.unallowed, out_head + '_unallowed', ['UnallowedChar', 'Count'])
         Utils.save_counter_json(result.unallowed, out_head + '_unallowed')
-        Utils.save_counter_csv(result.unallowedchar, out_head + '_unallowedchar', ['UnallowedChar', 'Count'])
         Utils.save_counter_json(result.unallowedchar, out_head + '_unallowedchar')
 
 #--------------------------------------
@@ -67,7 +68,7 @@ def count_allowed_unallowed(patterns, out_heads, max_docs=None, clean=True):
 #--------------------------------------
 def count_chars(max_docs):
     char_counts = Counter()
-    for d in Data.Default(max_docs):
+    for d in Data.DataLoader(max_docs):
         char_counts.update(d)
     print_char_counts(char_counts)
     Utils.save_counter_json(char_counts, "char_counts.json")
@@ -79,7 +80,7 @@ def count_chars(max_docs):
 def build_akshara_grams(patt, outhead, max_docs=None):
     print("\nBuilding trigram using pattern: ", patt)
     model = TriGram()
-    data = Data.Default(max_docs)
+    data = Data.DataLoader(max_docs)
 
     for d in tqdm(data, desc="Feeding text to Trigram"):
         d = clean_text(d)

@@ -52,8 +52,10 @@ def find_missed_quotes(text: str, buf: int = 2, prin=False) -> List[Tuple[int, i
     return missed
 
 def clean_white_spaces(text:str) -> str:
-    text = text.replace('–', '-')   # en-dash with hypen
+    text = text.replace('–', '-')   # en-dash with hyphen
     text = text.replace('\t', ' ')
+    text = text.replace('\xa0', ' ')  # Some ASCII Special Space
+    text = text.replace('…', '...')   # Ellipsis
     text = re.sub(r' +', ' ', text)
     text = re.sub(r'\r', '\n', text)
     text = re.sub(r'\n+', '\n', text)

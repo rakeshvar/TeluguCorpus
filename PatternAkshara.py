@@ -2,7 +2,7 @@ import re
 
 #---------------------------------------------------------------------
 A = '[అ-ఔౠౡ]'                 # acculu
-H = '[క-హ]'                      # hallulu
+H = '[క-ళవ-హ]'                   # hallulu (Avoid ఴ, ౚ)
 U = '[ఁంః]'                    # ubhayamulu
 M = '[ా-ౌౢౣ]'                   #  maatralu
 V = '[్]'                       # viramam
