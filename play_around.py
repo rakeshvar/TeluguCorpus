@@ -36,8 +36,15 @@ def to_remove(ch:str, count:int) -> bool:
     
     return False
 
+#--------------------------------------
+import argparse
+parser = argparse.ArgumentParser(description="Create a sample text from a tri-gram model.",
+                                 formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+parser.add_argument("-G", "--gram", type=str, default="models/akshara_gram.pkl.gz", help="Path to the saved trigram model")
+parser.add_argument("-N", "--len", type=int, default=100, help="Length of string to be generated.")
+args = parser.parse_args()
 
-samplerd = SamplerDict("models/akshara_gram.pkl.gz")
+samplerd = SamplerDict(args.gram)
 trim_low_counts(samplerd.uni, samplerd.bi, samplerd.tri, to_remove)
-textd = samplerd.generate_text(["\n"], 10)
+textd = samplerd.generate_text(["\n"], args.len)
 print(textd)
