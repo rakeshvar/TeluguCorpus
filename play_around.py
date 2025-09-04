@@ -21,9 +21,6 @@ def test_gen(gz_in, npz_in, nchars=200):
 #--------------------------------------
 
 def to_remove(ch:str, count:int) -> bool:
-    # if 'ౚ' in ch:   # U+0C5A RRRA
-    #     return True
-
     if count > 108:  # Too frequent
         return False
 

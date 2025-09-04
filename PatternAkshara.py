@@ -12,7 +12,7 @@ O = '[ॐ।॥₹\u200C]'                # Others
 P = '[!()+,./0-9:;=?]'           # Common Punctuation
 Q = r'[#$%&*<>@[\\\]^_`{|}~]'    # Uncommon Punctuation
 X = '["\'`-\t\r]'                # Should be replaced with Unicode equivalent
-R = '[-—‘’“”]'                   # Unicode Punctuation
+R = '[-—‘’“”\u001e]'             # Unicode Punctuation
 S = r'[ \n]'                     # Space
 E = '[a-zA-Z]'                   # English
 Z = '[ౘౙఽ]'

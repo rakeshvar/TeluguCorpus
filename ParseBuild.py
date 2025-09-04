@@ -85,7 +85,8 @@ def build_akshara_grams(patt, outhead, max_docs=None):
     for d in tqdm(data, desc="Feeding text to Trigram"):
         d = clean_text(d)
         tel = match_pattern_simple(d, patt)
-        model.process_text(tel)
+        if len(tel) > 1:
+            model.process_text(tel)
 
     model.save_dicts(outhead)
     model.convert_to_mat()
