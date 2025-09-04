@@ -21,8 +21,4 @@ akshara = (f"{U}|{A}|{N}|{O}|{P}|{Q}|{R}|{S}|{E}|{Z}|" # Individuals
            f"{H}(?:{V}{H})*{M}|"                       # Compounds with matra
            f"(?:{H}{V})+(?!{H})|"                      # Compounds with virama
            f"{H}(?:{V}{H})*(?!{MV})")                  # Compounds without matra
-
-print("Akshara Pattern: ", akshara)
 akshara_pattern = re.compile(akshara)
-
-#-------------------------------------------------------------

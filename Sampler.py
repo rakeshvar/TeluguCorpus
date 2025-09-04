@@ -75,14 +75,17 @@ class SamplerDict:
 
     def next_char_bi(self, a):
         if len(self.bi[a]) == 0:
+            print(f"({a}) not in bi")
             return self.next_char_uni()
         k, v = zip(*self.bi[a].items())
         return random.choices(k, weights=v, k=1)[0]
 
     def next_char_tri(self, a, b):
         if a not in self.tri or len(self.tri[a]) == 0:
+            print(f"({a}) not in tri")
             return self.next_char_uni()
         if b not in self.tri[a] or len(self.tri[a][b]) == 0:
+            print(f"({a}, {b}) not in tri")
             return self.next_char_bi(a)
         k, v = zip(*self.tri[a][b].items())
         return random.choices(k, weights=v, k=1)[0]

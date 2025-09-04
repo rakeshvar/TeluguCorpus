@@ -20,14 +20,21 @@ def test_gen(gz_in, npz_in, nchars=200):
 
 #--------------------------------------
 
-def to_remove(ch, count):
-    if count < 5 or len(ch) > 4:
-        if '్' not in ch:   # Remove only conjuncts
-            return False
-        
-        if count > 108:   # Too frequent
-            return False
+def to_remove(ch:str, count:int) -> bool:
+    if 'ౚ' in ch:   # U+0C5A RRRA
+        return True
 
+    if count > 108:  # Too frequent
+        return False
+
+    if '్' not in ch:  # Remove only conjuncts
+        return False
+
+    if count < 5:
+        return True
+
+    if len(ch) > 4:
+        print(f"Removing {ch} of len {len(ch)} with count {count}.")
         return True
     
     return False

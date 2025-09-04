@@ -12,10 +12,10 @@ from Unicode import print_char_counts
 # Pattern Matching and finding hits and misses
 #--------------------------------------
 def match_pattern_simple(text, pattern):
-    matches = ['\n']
+    matches = []
     for match in pattern.finditer(text):
         matches.append(match.group())
-    matches.append('\n')
+    matches.append('\n')                # Standardize single \n at EOL
     return matches
 
 def match_pattern(text, pattern):
@@ -77,7 +77,7 @@ def count_chars(max_docs):
 # Make the TriGram
 #--------------------------------------
 def build_akshara_grams(patt, outhead, max_docs=None):
-    print("Building trigram using pattern: ", patt)
+    print("\nBuilding trigram using pattern: ", patt)
     model = TriGram()
     data = Data.Default(max_docs)
 

@@ -10,7 +10,7 @@ Path(outdir).mkdir(exist_ok=True)
 #-------------------
 # Test Run
 #-------------------
-if False:
+if True:
     M, Mt = 10000, "10K"
     build_akshara_grams(character_pattern, f"{outdir}/char_gram_{Mt}", max_docs=M)
     build_akshara_grams(akshara_pattern, f"{outdir}/akshara_gram_{Mt}", max_docs=M)

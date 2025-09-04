@@ -11,6 +11,7 @@ class TriGram():
         self.uni = Counter()
         self.bi = defaultdict(Counter)
         self.tri = dict()
+        self.tail = '\n\n'
 
     def addtotri(self, s, t, u, v=1):   # This way self.tri can be pickled
         if s not in self.tri:
@@ -18,19 +19,29 @@ class TriGram():
         self.tri[s][t][u] += v
 
     def process_text(self, text):
-        for i in range(len(text)-2):
+        l = len(text)
+        if l < 2:
+            print(f"Skipping Short sentence of len ({l}: ({text})")
+            return
+
+        # Continue from previous doc
+        s, t = self.tail
+        u, v = text[:2]
+        self.addtotri(s, t, u)
+        self.bi[t][u] += 1
+        self.addtotri(t, u, v)
+
+        for i in range(l - 2):
             s, t, u = text[i:(i+3)]
             self.uni[s] += 1
             self.bi[s][t] += 1
             self.addtotri(s, t, u)
 
-        try:
-            s, t = text[-2:]
-            self.uni[s] += 1
-            self.uni[t] += 1
-            self.bi[s][t] += 1
-        except:
-            print("Bad text: ", text)
+        # Add tail
+        s, t = self.tail = text[-2:]
+        self.uni[s] += 1
+        self.bi[s][t] += 1
+        self.uni[t] += 1
 
     def convert_to_mat(self):
         v = len(self.uni)

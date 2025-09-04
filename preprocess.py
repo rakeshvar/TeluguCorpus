@@ -10,7 +10,7 @@ Path(outdir).mkdir(exist_ok=True)
 #-------------------
 # Test Run
 #-------------------
-if False:
+if True:
     M, Mt = 100000, "1L"
 
     count_allowed_unallowed(

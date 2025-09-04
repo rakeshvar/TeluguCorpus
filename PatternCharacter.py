@@ -12,6 +12,3 @@ X = '"' + r"'`–\t\r"                # Should be replaced with Unicode equivale
 
 allowed = f'{T}{O}{P}{Q}{R}{S}{E}'
 character_pattern = re.compile(f'[{allowed}]')
-
-print("Allowed Character Pattern: ", allowed)
-print("\t Compiled: ", character_pattern)
