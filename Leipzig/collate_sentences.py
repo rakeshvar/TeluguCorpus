@@ -13,7 +13,7 @@ with open(output_file, 'w', encoding='utf-8') as outfile:
           try:
             cleaned_line = line.split(' ', 1)[1].strip()
             outfile.write(cleaned_line + '\n')
-          except e:
+          except Exception as e:
             print(f"Error {e} in {input_file} at...")
             print(cleaned_line)
 

@@ -3,16 +3,33 @@ import unicodedata
 from typing import List, Tuple
 
 quote_patterns = [
-            (r'(\W|^)"(\w)', r'\1“\2'),  # Opening double quotes
-            (r'(\w)"(\W|$)', r'\1”\2'),  # Closing double quotes
-            (r"(\W|^)'(\w)", r'\1\‘\2'),  # Opening single quotes
-            (r"(\w)'(\W|$)", r'\1\’\2'),  # Closing single quotes
-        ]
+    (r'^"', r'“'),   # Start
+    (r'"$', r'”'),
+    (r"^'", r'‘'),   # End
+    (r"'$", r'’'),
+    (r'\b"', r'”'),  # Boundary
+    (r'"\b', r'“'),
+    (r"\b'", r'’'),
+    (r"'\b", r'‘'),
+    (r'([^\s\w])"', r'\1”'),    # Punctuation
+    (r"([^\s\w])'", r'\1’'),
+    (r"\S'\S", r'’'),           # Apostrophes between non-spaces
+    (r'"([^"]+)"', '“\1”'),     # Quote UnQuote
+    (r"'([^']+)'", '‘\1’'),
+    (r'“([^"]+)"', '“\1”'),
+    (r"‘([^']+)'", '‘\1’'),
+    (r'"([^"]+)”', '“\1”'),
+    (r"'([^']+)’", '‘\1’'),
+    (r" ' ", r' '),             # Remove Stray ones
+    (r' " ', r' '),
+]
+
 duplicate_quotes = [
-            (r'``', '"'),  # LaTeX-style opening quotes
-            (r"''", '"'),  # LaTeX-style closing quotes
-            (r'`', "'"),  # Backtick to single quote
-        ]
+    (r'``', '"'),
+    (r'`', "'"),   # Backtick to single quote
+    (r"''", '"'),
+    (r'"+', '"')   # Multiple double quotes
+]
 
 def clean_quotes(text: str) -> str:
     """Clean quotes in a single text string"""
@@ -24,16 +41,18 @@ def clean_quotes(text: str) -> str:
 
     return text
 
-def find_missed_quotes(text: str, buf: int = 2) -> List[Tuple[int, int, str]]:
+def find_missed_quotes(text: str, buf: int = 2, prin=False) -> List[Tuple[int, int, str]]:
     """Find remaining ASCII quotes that might need manual review"""
     missed = []
-    for match in re.finditer(r'["\']', text):
+    for match in re.finditer('["\']', text):
         context = text[max(0, match.start() - buf):min(len(text), match.end() + buf)]
         missed.append((match.start(), match.end(), context))
+        if prin:
+            print(f"Missed {match.group()} in {context}")
     return missed
 
 def clean_white_spaces(text:str) -> str:
-    text = text.replace('-', '–')
+    text = text.replace('–', '-')   # en-dash with hypen
     text = text.replace('\t', ' ')
     text = re.sub(r' +', ' ', text)
     text = re.sub(r'\r', '\n', text)
@@ -50,7 +69,7 @@ def clean_unicode(text:str) -> str:
     text = unicodedata.normalize('NFC', text)
     return text
 
-def clean(text):
+def clean_text(text):
     text = clean_quotes(text)
     text = clean_white_spaces(text)
     text = clean_unicode(text)

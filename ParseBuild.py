@@ -3,7 +3,7 @@ from tqdm import tqdm
 
 import Data
 import Utils
-from Cleaner import clean
+from Cleaner import clean_text
 from Sampler import SamplerMat, SamplerDict
 from TriGram import TriGram
 from Unicode import print_char_counts
@@ -32,21 +32,28 @@ def match_pattern(text, pattern):
     return matched, missed
 
 
-def parse_allowed_unallowed(patterns, out_heads, max_docs=None):
-    Result = namedtuple('Result', ['allowed', 'unallowed'])
-    results = [Result(allowed=Counter(), unallowed=Counter()) for _ in patterns]
+def count_allowed_unallowed(patterns, out_heads, max_docs=None, clean=True):
+    Result = namedtuple('Result', ['allowed', 'unallowed', 'unallowedchar'])
+    results = [Result(allowed=Counter(),
+                      unallowed=Counter(),
+                      unallowedchar=Counter()) for _ in patterns]
 
     for i, d in enumerate(tqdm(Data.Default(max_docs), desc="Parsing Patterns of Data")):
+        if clean:
+            d = clean_text(d)
         for patt, result in zip(patterns, results):
             tt, ot = match_pattern(d, patt)
             result.allowed.update(tt)
             result.unallowed.update(ot)
+            result.unallowedchar.update("".join(ot))
 
     for result, out_head in zip(results, out_heads):
         Utils.save_counter_csv(result.allowed, out_head + '_allowed', ['AllowedChar', 'Count'])
         Utils.save_counter_json(result.allowed, out_head + '_allowed')
         Utils.save_counter_csv(result.unallowed, out_head + '_unallowed', ['UnallowedChar', 'Count'])
         Utils.save_counter_json(result.unallowed, out_head + '_unallowed')
+        Utils.save_counter_csv(result.unallowedchar, out_head + '_unallowedchar', ['UnallowedChar', 'Count'])
+        Utils.save_counter_json(result.unallowedchar, out_head + '_unallowedchar')
 
 #--------------------------------------
 # Counts
@@ -69,7 +76,7 @@ def build_akshara_grams(patt, outhead, max_docs=None):
     spurious = Counter()
 
     for d in tqdm(data, desc="Feeding text to Trigram"):
-        d = clean(d)
+        d = clean_text(d)
         tel, oth = match_pattern(d, patt)
         model.process_text(tel)
         spurious.update(oth)
