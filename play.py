@@ -21,9 +21,19 @@ def test_gen(gz_in, npz_in, nchars=200):
 #--------------------------------------
 
 def to_remove(ch, count):
-    return count < 5 or len(ch) > 5
+    if count < 5 or len(ch) > 4:
+        if '్' not in ch:   # Remove only conjuncts
+            return False
+        
+        if count > 108:   # Too frequent
+            return False
 
-samplerd = SamplerDict("models/aksharagram.pkl.gz")
+        return True
+    
+    return False
+
+
+samplerd = SamplerDict("models/akshara_gram.pkl.gz")
 trim_low_counts(samplerd.uni, samplerd.bi, samplerd.tri, to_remove)
-textd = samplerd.generate_text(["\n"], 10000)
+textd = samplerd.generate_text(["\n"], 10)
 print(textd)

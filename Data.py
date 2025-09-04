@@ -4,7 +4,7 @@ from datasets import load_dataset
 class Leipzig:
     def __init__(self, max_docs=None):
         self.max_docs = max_docs
-        with open("leipzig.txt", "r", encoding='utf-8') as f:
+        with open("Leipzig/leipzig.txt", "r", encoding='utf-8') as f:
             self.contents = f.readlines()
 
     def __iter__(self):
