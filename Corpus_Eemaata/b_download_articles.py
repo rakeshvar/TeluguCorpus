@@ -22,7 +22,6 @@ for k, v in article_issue_dict.items():
     c[v] += 1
 
 filelist = os.listdir("articles")
-printer_friendly = "http://www.eemaata.com/em/printerfriendly/?id="
 
 def getlink(iss_id, art_id):
     return f"https://eemaata.com/em/issues/{iss_id}/{art_id}.html"
@@ -58,7 +57,7 @@ from threading import Thread
 try:
     nthreads = int(sys.argv[1])
 except:
-    nthreads = 1
+    nthreads = 8
 
 for ithread in range(nthreads):
     th = Thread(target=onethreadfn, args=(nthreads, ithread))

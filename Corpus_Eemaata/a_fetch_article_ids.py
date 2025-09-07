@@ -12,11 +12,7 @@ headers = {
 issue_head = "https://www.eemaata.com/em/category/issues/"
 
 
-# Load the sorted issues list
-with open("arxiv/issues_list.json", 'r') as f:
-    valid_issue_ids = json.load(f)
-
-found_ids = set()
+found_issues = set()
 article_issue_dict = {}
 try_issue_ids = [f"{year:4d}{1 + month:02d}" for year in range(1998, 2026) for month in range(12)]
 
@@ -27,19 +23,11 @@ for issue_id in try_issue_ids:
         response = requests.get(url, headers=headers)
         response.raise_for_status()  # Raises an exception for 4xx/5xx errors
     except requests.exceptions.HTTPError as e:
-        if issue_id <= "201301":
-            if issue_id not in valid_issue_ids:
-                print("OK. Not Found.")
-            else:
-                print(f"NOT OK ###### HTTP Error: {e}")
-        else:
-            print("No Issue.")
-
+        print("No Issue.")
     except requests.exceptions.RequestException as e:
         print(f"!!!!!!!REQUEST FAILED: {e}")
-
     else:
-        found_ids.add(issue_id)
+        found_issues.add(issue_id)
         content = response.content.decode('utf-8')
         pattern = re.compile(issue_id + r"/(\d+)", re.S)
         articles = set()
@@ -51,11 +39,11 @@ for issue_id in try_issue_ids:
         print("Articles: ", articles)
 
 
-print("New Issues: ", sorted(list(found_ids - valid_issue_ids)))
+print("Issues Found: ", sorted(list(found_issues)))
 article_issue_dict = OrderedDict(sorted(article_issue_dict.items(), key=lambda kv: (kv[1], kv[0])))
 print(article_issue_dict)
-with open("arxiv/article_issue_lookup.json", 'w') as f:
+with open("archive/article_issue_lookup_tmp.json", 'w') as f:
     json.dump(article_issue_dict, f, indent=2, ensure_ascii=True)
-with open("arxiv/issues_list.json", 'w') as f:
-    json.dump(sorted(list(found_ids)), f, indent=2, ensure_ascii=True)
+with open("archive/issues_list_tmp.json", 'w') as f:
+    json.dump(sorted(list(found_issues)), f, indent=2, ensure_ascii=True)
 
